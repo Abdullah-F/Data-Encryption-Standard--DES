@@ -127,34 +127,7 @@ public class DES {
         return permuted_32_bits;
     }
 
-    private static StringBuilder shift_C0_D0_Left(StringBuilder C0) {
-        char first_Char_in_C0;
-
-        first_Char_in_C0 = C0.charAt(0);
-
-        for (int i = 0; i < C0.length() - 1; i++) {
-            C0.setCharAt(i, C0.charAt(i + 1));
-        }
-
-        C0.setCharAt(C0.length() - 1, first_Char_in_C0);
-        return C0;
-
-    }
-
-    private static StringBuilder shift_C0_D0_Right(StringBuilder C0) {
-        char last_Char_in_C0;
-
-        last_Char_in_C0 = C0.charAt(C0.length() - 1);
-
-        for (int i = C0.length() - 1; i > 0; i--) {
-            C0.setCharAt(i, C0.charAt(i - 1));
-        }
-
-        C0.setCharAt(0, last_Char_in_C0);
-        return C0;
-
-    }
-
+    
     private static void key_Schedule(StringBuilder initial_Key) {
         PC_1(initial_Key);
         StringBuilder C0, D0;
@@ -167,11 +140,11 @@ public class DES {
 
         for (int i = 0; i < 16; i++) {
             if (i==0 ||i == 1 || i == 8 || i == 15) {
-                C0 = new StringBuilder(shift_C0_D0_Left(C0));
-                D0 = new StringBuilder(shift_C0_D0_Left(D0));
+                C0 = new StringBuilder(Help.shift_C0_D0_Left(C0));
+                D0 = new StringBuilder(Help.shift_C0_D0_Left(D0));
             } else {
-                C0 = new StringBuilder(shift_C0_D0_Left(shift_C0_D0_Left(C0)));
-                D0 = new StringBuilder(shift_C0_D0_Left(shift_C0_D0_Left(D0)));
+                C0 = new StringBuilder(Help.shift_C0_D0_Left(Help.shift_C0_D0_Left(C0)));
+                D0 = new StringBuilder(Help.shift_C0_D0_Left(Help.shift_C0_D0_Left(D0)));
             }
 
             Key_Transforms.add(PC_2(new StringBuilder(C0.toString()).append(D0.toString())));
@@ -187,11 +160,11 @@ public class DES {
         Key_Transforms2.add(PC_2(new StringBuilder(C.toString()).append(D.toString())));
         for (int i = 1; i <= 15; i++) {
             if (i == 1 || i == 8 || i == 15) {
-                C = new StringBuilder(shift_C0_D0_Right(C));
-                D = new StringBuilder(shift_C0_D0_Right(D));
+                C = new StringBuilder(Help.shift_C0_D0_Right(C));
+                D = new StringBuilder(Help.shift_C0_D0_Right(D));
             } else if(i != 0) {
-                C = new StringBuilder(shift_C0_D0_Right(shift_C0_D0_Right(C)));
-                D = new StringBuilder(shift_C0_D0_Right(shift_C0_D0_Right(D)));
+                C = new StringBuilder(Help.shift_C0_D0_Right(Help.shift_C0_D0_Right(C)));
+                D = new StringBuilder(Help.shift_C0_D0_Right(Help.shift_C0_D0_Right(D)));
             }
    
             
@@ -199,210 +172,22 @@ public class DES {
         }
     }
 
-    private static String toBinary(int n) {
-
-        if (n == 0) {
-            return "0000";
-        }
-
-        String binary = "";
-        while (n > 0) {
-            int rem = n % 2;
-            binary = rem + binary;
-            n = n / 2;
-        }
-
-        while (binary.length() < 4) {
-            binary = 0 + binary;
-        }
-
-        return binary;
-    }
-
-    private static int integerfrombinary(String sb_bits) {
-        double j = 0;
-        for (int i = 0; i < sb_bits.length(); i++) {
-            if (sb_bits.charAt(i) == '1') {
-                j += Math.pow(2, sb_bits.length() - 1 - i);
-            }
-        }
-        return (int) j;
-    }
-
-    private static String S_Box1(String _6_Bits) {
-        String _4_Bits;
-        int[][] sBox = new int[][]{
-            {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
-            {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
-            {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 15, 0},
-            {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}};
-
-        int column = integerfrombinary(_6_Bits.substring(1, 5));
-
-        int row = integerfrombinary(_6_Bits.substring(0, 1) + _6_Bits.substring(5));
-
-        _4_Bits = toBinary(sBox[row][column]);
-
-        return _4_Bits;
-
-    }
-
-    private static String S_Box2(String _6_Bits) {
-        String _4_Bits;
-        int[][] sBox = new int[][]{
-            {15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10},
-            {3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 01, 10, 6, 9, 11, 05},
-            {0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15},
-            {13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9}};
-
-        int column = integerfrombinary(_6_Bits.substring(1, 5));
-
-        int row = integerfrombinary(_6_Bits.substring(0, 1) + _6_Bits.substring(5));
-
-        _4_Bits = toBinary(sBox[row][column]);
-
-        return _4_Bits;
-
-    }
-
-    private static String S_Box3(String _6_Bits) {
-        String _4_Bits;
-        int[][] sBox = new int[][]
-        {{10, 0, 9, 14, 6, 03, 15, 5, 1, 13, 15, 7, 11, 4, 2, 8},
-        {13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1},
-        {13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7},
-        {1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12}};
-
-        int column = integerfrombinary(_6_Bits.substring(1, 5));
-
-        int row = integerfrombinary(_6_Bits.substring(0, 1) + _6_Bits.substring(5));
-
-        _4_Bits = toBinary(sBox[row][column]);
-
-        return _4_Bits;
-
-    }
-
-    private static String S_Box4(String _6_Bits) {
-        String _4_Bits;
-        int[][] sBox = new int[][]
-        {{07, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15},
-        {13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9},
-        {10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4},
-        {3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14}};
-
-        int column = integerfrombinary(_6_Bits.substring(1, 5));
-
-        int row = integerfrombinary(_6_Bits.substring(0, 1) + _6_Bits.substring(5));
-
-        _4_Bits = toBinary(sBox[row][column]);
-
-        return _4_Bits;
-
-    }
-
-    private static String S_Box5(String _6_Bits) {
-        String _4_Bits;
-
-        int[][] sBox = new int[][]
-        {{2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9},
-        {14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6},
-        {4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14},
-        {11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3}};
-
-        int column = integerfrombinary(_6_Bits.substring(1, 5));
-
-        int row = integerfrombinary(_6_Bits.substring(0, 1) + _6_Bits.substring(5));
-
-        _4_Bits = toBinary(sBox[row][column]);
-
-        return _4_Bits;
-
-    }
-
-    private static String S_Box6(String _6_Bits) {
-        String _4_Bits;
-
-        int[][] sBox = new int[][]
-        {{12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11},
-        {10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8},
-        {9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6},
-        {4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13}};
-
-        int column = integerfrombinary(_6_Bits.substring(1, 5));
-
-        int row = integerfrombinary(_6_Bits.substring(0, 1) + _6_Bits.substring(5));
-
-        _4_Bits = toBinary(sBox[row][column]);
-
-        return _4_Bits;
-
-    }
-
-    private static String S_Box7(String _6_Bits) {
-        String _4_Bits;
-
-        int[][] sBox = new int[][]
-        {{4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1},
-        {13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6},
-        {1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2},
-        {6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12}};
-
-        int column = integerfrombinary(_6_Bits.substring(1, 5));
-
-        int row = integerfrombinary(_6_Bits.substring(0, 1) + _6_Bits.substring(5));
-
-        _4_Bits = toBinary(sBox[row][column]);
-
-        return _4_Bits;
-
-    }
-
-    private static String S_Box8(String _6_Bits) {
-        String _4_Bits;
-        int[][] sBox = new int[][]
-        {{13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7},
-        {1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2},
-        {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 05, 8},
-        {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}};
-
-        int column = integerfrombinary(_6_Bits.substring(1, 5));
-
-        int row = integerfrombinary(_6_Bits.substring(0, 1) + _6_Bits.substring(5));
-
-        _4_Bits = toBinary(sBox[row][column]);
-
-        return _4_Bits;
-
-    }
-
-    private static StringBuilder XoR(StringBuilder _48_Bits, StringBuilder key) {
-
-        for (int i = 0; i < key.length(); i++) {
-            if (_48_Bits.charAt(i) == key.charAt(i)) {
-                key.setCharAt(i, '0');
-            } else if (_48_Bits.charAt(i) != key.charAt(i)) {
-                key.setCharAt(i, '1');
-            }
-
-        }
-        return key;
-    }
-
+    
+   
     private static StringBuilder F(StringBuilder right_32_Bits, StringBuilder ki) {
         
         StringBuilder expanded_Right_Bits = new StringBuilder(expand_R(ki));
         
-        ki = new StringBuilder(XoR(expanded_Right_Bits, ki));
+        ki = new StringBuilder(Help.XoR(expanded_Right_Bits, ki));
 
-        ki = new StringBuilder(S_Box1(ki.substring(0, 6)) +
-                S_Box2(ki.substring(6, 12))
-                + S_Box3(ki.substring(12, 18)) +
-                S_Box4(ki.substring(18, 24)) +
-                S_Box5(ki.substring(24, 30))+
-                 S_Box6(ki.substring(30, 36)) + 
-                S_Box7(ki.substring(36, 42)) + 
-                S_Box8(ki.substring(42, 48)));
+        ki = new StringBuilder(Help.S_Box(ki.substring(0, 6),Data.sBox1) +
+                Help.S_Box(ki.substring(6, 12),Data.sBox2)
+                + Help.S_Box(ki.substring(12, 18),Data.sBox3) +
+                Help.S_Box(ki.substring(18, 24),Data.sBox4) +
+                Help.S_Box(ki.substring(24, 30),Data.sBox5)+
+                 Help.S_Box(ki.substring(30, 36),Data.sBox6) + 
+                Help.S_Box(ki.substring(36, 42),Data.sBox7) + 
+                Help.S_Box(ki.substring(42, 48),Data.sBox8));
 
         ki = f_Function_Permutation(ki);
         
@@ -417,9 +202,6 @@ public class DES {
         
         plainText = IP(plainText);
         
-        System.out.println("**********************************88888888");
-        System.out.println(plainText);
-        System.out.println("********************************************");
         StringBuilder Left, Right, right;
         
         Left = new StringBuilder(plainText.substring(0, 32));
@@ -427,7 +209,7 @@ public class DES {
 
         for (int i = 0; i < 16; i++) {
             right = Right;
-            Right = XoR(Left, F(Right, Key_Transforms.get(i)));
+            Right = Help.XoR(Left, F(Right, Key_Transforms.get(i)));
             Left = right;
         }
 
@@ -450,7 +232,7 @@ public class DES {
 
         for (int i =0; i < 16; i++) {
             right = Right;
-            Right = XoR(Left, F(Right, Key_Transforms2.get(i)));
+            Right = Help.XoR(Left, F(Right, Key_Transforms2.get(i)));
             Left = right;
         }
 
